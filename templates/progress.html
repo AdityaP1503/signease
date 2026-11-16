@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}My Learning Progress – SignEase{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header -->
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8">
+      <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill mb-2">
+        <i class="bi bi-graph-up me-1"></i> Performance Analytics
+      </span>
+      <h2 class="fw-bold mb-1">My Learning Progress</h2>
+      <p class="text-muted mb-0">
+        Track your daily consistency, gesture accuracy, and sign practice history.
+      </p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+      <a href="{{ url_for('assignment') }}" class="btn btn-primary-gradient">
+        <i class="bi bi-play-circle me-1"></i> Continue Today's Assignment
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics Row (4 Cards) -->
+  <div class="row g-3 mb-4">
+    <!-- Card 1: Completed Assignments -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="custom-card p-3 h-100 border-start border-4 border-primary">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small d-block">Assignments Finished</span>
+            <h3 class="fw-bold text-dark mb-0">{{ summary.total_assignments_completed }}</h3>
+          </div>
+          <div class="card-icon-box icon-blue mb-0" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-journal-check"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Total Questions Attempted -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="custom-card p-3 h-100 border-start border-4 border-info">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small d-block">Signs Attempted</span>
+            <h3 class="fw-bold text-dark mb-0">{{ summary.total_questions_attempted }}</h3>
+          </div>
+          <div class="card-icon-box icon-blue mb-0" style="width: 44px; height: 44px; font-size: 1.25rem; background: #e0f2fe; color: #0284c7;">
+            <i class="bi bi-hand-index-thumb"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Correct vs Incorrect -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="custom-card p-3 h-100 border-start border-4 border-success">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small d-block">Correct / Incorrect</span>
+            <h3 class="fw-bold text-success mb-0">
+              {{ summary.correct_answers }} <span class="text-muted fs-6 fw-normal">/ {{ summary.incorrect_answers }}</span>
+            </h3>
+          </div>
+          <div class="card-icon-box icon-green mb-0" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-check2-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Overall Accuracy -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="custom-card p-3 h-100 border-start border-4 border-purple" style="border-color: #7c3aed !important;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small d-block">Overall Accuracy</span>
+            <h3 class="fw-bold text-purple mb-0" style="color: #7c3aed;">{{ summary.accuracy }}%</h3>
+          </div>
+          <div class="card-icon-box icon-purple mb-0" style="width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="bi bi-bullseye"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accuracy Banner -->
+  <div class="custom-card p-4 mb-4">
+    <div class="row align-items-center gy-3">
+      <div class="col-md-4 text-center border-end">
+        <span class="text-muted small text-uppercase fw-bold">Formula</span>
+        <div class="mt-2 font-monospace small bg-light p-2 rounded border">
+          Accuracy = (Correct / Attempted) &times; 100
+        </div>
+        <div class="mt-2 fs-5 fw-bold text-primary">
+          ({{ summary.correct_answers }} / {{ summary.total_questions_attempted }}) &times; 100 = {{ summary.accuracy }}%
+        </div>
+      </div>
+
+      <div class="col-md-8 ps-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="fw-semibold text-dark">Overall Recognition Accuracy</span>
+          <span class="fw-bold text-primary">{{ summary.accuracy }}%</span>
+        </div>
+        <div class="progress progress-modern" style="height: 14px;">
+          <div class="progress-bar" role="progressbar" style="width: {{ summary.accuracy }}%;" aria-valuenow="{{ summary.accuracy }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <small class="text-muted d-block mt-2">
+          Consistent practice improves your hand posture clarity and recognition speed in MediaPipe.
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Assignment History Table -->
+  <div class="custom-card overflow-hidden">
+    <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold mb-0">
+        <i class="bi bi-clock-history text-primary me-2"></i>Daily Assignment History
+      </h5>
+      <span class="badge bg-white text-secondary border">Stored in SQLite</span>
+    </div>
+
+    {% if summary.history %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Assignment Date</th>
+            <th>Questions</th>
+            <th>Correct Signs</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th class="pe-4 text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in summary.history %}
+          <tr>
+            <td class="ps-4 fw-semibold text-dark">
+              <i class="bi bi-calendar3 me-2 text-primary"></i> {{ row.assignment_date }}
+            </td>
+            <td>{{ row.total_questions }} Signs</td>
+            <td>
+              <span class="badge bg-light text-dark border">
+                {{ row.correct_count }} / {{ row.total_questions }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress progress-modern flex-grow-1" style="width: 70px; height: 6px;">
+                  <div class="progress-bar {% if row.score >= 80 %}bg-success{% elif row.score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ row.score }}%;"></div>
+                </div>
+                <span class="fw-bold small">{{ row.score }}%</span>
+              </div>
+            </td>
+            <td>
+              {% if row.status == 'completed' %}
+              <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                <i class="bi bi-check-circle-fill me-1"></i> Completed
+              </span>
+              {% else %}
+              <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1">
+                <i class="bi bi-hourglass-split me-1"></i> In Progress
+              </span>
+              {% endif %}
+            </td>
+            <td class="pe-4 text-end">
+              <a href="{{ url_for('assignment', date=row.assignment_date) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                {% if row.status == 'completed' %}Review{% else %}Continue{% endif %}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-journal-x fs-1 text-muted d-block mb-2"></i>
+      <h5 class="fw-bold text-secondary">No Assignment History Yet</h5>
+      <p class="text-muted small mb-3">Complete your first daily assignment using your webcam to view your stats here.</p>
+      <a href="{{ url_for('assignment') }}" class="btn btn-primary-gradient btn-sm px-4">
+        Start First Assignment
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

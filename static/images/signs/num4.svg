@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cardGrad_num4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Card -->
+  <rect width="300" height="300" rx="24" fill="url(#cardGrad_num4)" stroke="#E2E8F0" stroke-width="2"/>
+  
+  <!-- Artwork -->
+  <g id="gesture-art">
+    
+            <rect x="100" y="115" width="100" height="80" rx="18" fill="#FFE0B2" stroke="#4A3B32" stroke-width="4"/>
+            <path d="M115 190 L115 250 L175 250 L175 190 Z" fill="#FFCC80" stroke="#4A3B32" stroke-width="4"/>
+            <!-- Thumb folded inside -->
+            <path d="M98 150 C110 140, 140 140, 150 155 Z" fill="#FFCC80" stroke="#4A3B32" stroke-width="4"/>
+            <!-- 4 Fingers upright -->
+            <path d="M104 120 L104 46 C104 35, 122 35, 122 46 L123 120 Z" fill="#FFE0B2" stroke="#4A3B32" stroke-width="4"/>
+            <path d="M126 120 L126 40 C126 28, 144 28, 144 40 L144 120 Z" fill="#FFE0B2" stroke="#4A3B32" stroke-width="4"/>
+            <path d="M147 120 L147 42 C147 30, 165 30, 165 42 L165 120 Z" fill="#FFE0B2" stroke="#4A3B32" stroke-width="4"/>
+            <path d="M168 120 L170 54 C170 42, 188 42, 188 54 L185 120 Z" fill="#FFE0B2" stroke="#4A3B32" stroke-width="4"/>
+            <circle cx="230" cy="60" r="22" fill="#2563EB"/>
+            <text x="230" y="68" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">4</text>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="15" y="258" width="270" height="32" rx="10" fill="#1E293B" opacity="0.9"/>
+  <text x="150" y="279" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="bold" fill="#FFFFFF" text-anchor="middle">NUMBER 4</text>
+</svg>

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.name }} – ISL Guide & Practice – SignEase{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('learn') }}" class="text-decoration-none">Learn ISL</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('learn', category=lesson.category) }}" class="text-decoration-none text-capitalize">{{ lesson.category }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ lesson.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Left Column: Sign Details & Reference Art -->
+    <div class="col-lg-6">
+      <div class="custom-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="badge bg-primary-subtle text-primary text-uppercase px-3 py-1 rounded-pill fw-bold">
+            {{ lesson.category }}
+          </span>
+          {% if lesson.is_supported_in_ml %}
+          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+            <i class="bi bi-camera-video me-1"></i> Camera Recognition Supported
+          </span>
+          {% endif %}
+        </div>
+
+        <h2 class="fw-bold mb-2">{{ lesson.name }}</h2>
+        <p class="text-muted">{{ lesson.description }}</p>
+
+        <!-- Reference Image -->
+        <div class="text-center p-3 bg-light rounded-4 border mb-4">
+          <img src="{{ lesson.image_path }}" alt="{{ lesson.name }} reference sign" class="img-fluid" style="max-height: 280px;">
+        </div>
+
+        <!-- Instructions Box -->
+        <div class="mb-4">
+          <h5 class="fw-bold mb-2 text-dark"><i class="bi bi-hand-thumbs-up text-primary me-2"></i>How to Perform this Sign:</h5>
+          <div class="p-3 bg-primary-subtle rounded-3 border border-primary-subtle">
+            <p class="mb-0 text-dark" style="line-height: 1.6;">
+              {{ lesson.hand_instructions }}
+            </p>
+          </div>
+        </div>
+
+        {% if lesson.movement_notes %}
+        <div class="mb-4">
+          <h6 class="fw-bold text-dark"><i class="bi bi-arrow-repeat text-purple me-2" style="color:#7c3aed;"></i>Movement &amp; Dynamics:</h6>
+          <p class="text-secondary small mb-0">{{ lesson.movement_notes }}</p>
+        </div>
+        {% endif %}
+
+        <div class="d-flex gap-2 pt-2 border-top">
+          <a href="{{ url_for('learn') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Lessons
+          </a>
+          {% if lesson.is_supported_in_ml %}
+          <a href="{{ url_for('assignment', sign=lesson.sign_code) }}" class="btn btn-primary-gradient ms-auto">
+            <i class="bi bi-camera-video-fill me-1"></i> Practice in Daily Assignment
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Camera Tester for this Sign -->
+    <div class="col-lg-6">
+      <div class="custom-card p-4 h-100 d-flex flex-column" id="active-question-card" data-assignment-id="0" data-question-num="1" data-expected-sign="{{ lesson.sign_code }}">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold mb-0">
+            <i class="bi bi-webcam text-primary me-2"></i>Live Practice
+          </h4>
+          <span class="badge bg-light text-dark border">Single Sign Mode</span>
+        </div>
+        <p class="text-muted small mb-3">
+          Turn on your camera and hold your hand to perform <strong>{{ lesson.name }}</strong>. Click "Check Sign" to test your posture with AI.
+        </p>
+
+        <!-- Camera Box -->
+        <div class="camera-box mb-3">
+          <video id="webcam-video" autoplay playsinline muted class="d-none"></video>
+          <canvas id="webcam-canvas"></canvas>
+
+          <div id="camera-placeholder" class="camera-placeholder">
+            <i class="bi bi-camera-video-off"></i>
+            <h5 class="fw-bold mb-1">Camera is Off</h5>
+            <p class="small text-muted mb-3">Click "Start Camera" to practice in real time.</p>
+            <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" onclick="document.getElementById('btn-start-camera').click();">
+              <i class="bi bi-camera-video me-1"></i> Start Camera
+            </button>
+          </div>
+
+          <div id="camera-live-indicator" class="camera-live-indicator d-none">
+            <span class="pulse-dot"></span> LIVE
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button id="btn-start-camera" type="button" class="btn btn-primary flex-grow-1">
+            <i class="bi bi-camera-video me-1"></i> Start Camera
+          </button>
+          <button id="btn-stop-camera" type="button" class="btn btn-outline-danger flex-grow-1 d-none">
+            <i class="bi bi-stop-circle me-1"></i> Stop Camera
+          </button>
+          <button id="btn-check-sign" type="button" class="btn btn-success flex-grow-1" disabled>
+            <i class="bi bi-check2-circle me-1"></i> Check Sign
+          </button>
+          <button id="btn-retry-sign" type="button" class="btn btn-warning text-dark d-none">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Try Again
+          </button>
+        </div>
+
+        <!-- Result Feedback Card -->
+        <div id="feedback-card" class="feedback-card feedback-neutral mt-auto">
+          <span id="feedback-status-badge" class="badge bg-secondary mb-2">
+            <i class="bi bi-info-circle me-1"></i> Ready
+          </span>
+          <div id="feedback-text" class="fw-semibold">
+            Click "Start Camera" and show your hand in front of the lens.
+          </div>
+          <div id="feedback-details" class="d-none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/assignment.js') }}"></script>
+{% endblock %}

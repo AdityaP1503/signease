@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Learn Indian Sign Language – SignEase{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8">
+      <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2">
+        <i class="bi bi-mortarboard me-1"></i> Beginner Curriculum
+      </span>
+      <h2 class="fw-bold mb-1">Learn Indian Sign Language (ISL)</h2>
+      <p class="text-muted mb-0">
+        Browse categories, study hand postures, and practice gestures using your camera.
+      </p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+      <a href="{{ url_for('assignment') }}" class="btn btn-primary-gradient">
+        <i class="bi bi-camera-video me-1"></i> Start Daily Test
+      </a>
+    </div>
+  </div>
+
+  <!-- Category Filter Pills -->
+  <div class="d-flex flex-wrap gap-2 mb-4 pb-2 border-bottom">
+    <a href="{{ url_for('learn') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold {% if not active_category %}btn-primary text-white{% else %}btn-light text-secondary border{% endif %}">
+      <i class="bi bi-collection me-1"></i> All Signs ({{ lessons|length }})
+    </a>
+    <a href="{{ url_for('learn', category='words') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold {% if active_category == 'words' %}btn-primary text-white{% else %}btn-light text-secondary border{% endif %}">
+      <i class="bi bi-chat-quote me-1"></i> Basic Words
+    </a>
+    <a href="{{ url_for('learn', category='numbers') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold {% if active_category == 'numbers' %}btn-primary text-white{% else %}btn-light text-secondary border{% endif %}">
+      <i class="bi bi-123 me-1"></i> Numbers (0–9)
+    </a>
+    <a href="{{ url_for('learn', category='alphabets') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold {% if active_category == 'alphabets' %}btn-primary text-white{% else %}btn-light text-secondary border{% endif %}">
+      <i class="bi bi-fonts me-1"></i> Alphabets
+    </a>
+  </div>
+
+  <!-- Grid of Lessons -->
+  <div class="row g-4">
+    {% for lesson in lessons %}
+    <div class="col-md-6 col-lg-4">
+      <div class="learning-card h-100 d-flex flex-column">
+        <!-- Reference Image Container -->
+        <div class="sign-img-container">
+          <img src="{{ lesson.image_path }}" alt="{{ lesson.name }} ISL sign" loading="lazy">
+          {% if lesson.is_supported_in_ml %}
+          <span class="position-absolute top-0 end-0 m-2 badge bg-success-subtle text-success border border-success-subtle rounded-pill small">
+            <i class="bi bi-check-circle me-1"></i> Camera Supported
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-4 d-flex flex-column flex-grow-1">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-light text-primary border small text-uppercase fw-bold">{{ lesson.category }}</span>
+            <span class="text-muted small">ISL Code: <code>{{ lesson.sign_code }}</code></span>
+          </div>
+          
+          <h4 class="fw-bold mb-2">{{ lesson.name }}</h4>
+          <p class="text-muted small mb-3 flex-grow-1">
+            {{ lesson.description }}
+          </p>
+
+          <!-- Hand Position Instructions -->
+          <div class="p-3 bg-light rounded-3 mb-3 border">
+            <div class="small fw-bold text-dark mb-1">
+              <i class="bi bi-hand-index me-1 text-primary"></i> Hand Posture &amp; Movement:
+            </div>
+            <p class="small text-secondary mb-0">
+              {{ lesson.hand_instructions }}
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-2 mt-auto">
+            <a href="{{ url_for('lesson_detail', sign_code=lesson.sign_code) }}" class="btn btn-outline-custom btn-sm flex-grow-1">
+              <i class="bi bi-eye me-1"></i> Full Details
+            </a>
+            {% if lesson.is_supported_in_ml %}
+            <a href="{{ url_for('assignment', sign=lesson.sign_code) }}" class="btn btn-primary-gradient btn-sm px-3">
+              <i class="bi bi-camera-fill me-1"></i> Practice
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

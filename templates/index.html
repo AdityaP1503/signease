@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}SignEase – Learn Indian Sign Language (ISL){% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-7">
+        <div class="hero-badge">
+          <i class="bi bi-stars"></i> Interactive ISL Learning Platform
+        </div>
+        <h1 class="hero-title mb-3">
+          Learn Signs, <br>
+          <span class="gradient-text">Connect Hearts.</span>
+        </h1>
+        <p class="hero-lead mb-4">
+          <strong>SignEase</strong> is a beginner-friendly platform designed to bridge the communication gap between hearing individuals and the Deaf or hard-of-hearing community through <strong>Indian Sign Language (ISL)</strong>. Learn basic signs through clear illustrations, step-by-step hand guides, and practical AI-powered webcam assignments.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('learn') }}" class="btn btn-primary-gradient px-4 py-2">
+            <i class="bi bi-book-half me-2"></i> Start Learning
+          </a>
+          <a href="{{ url_for('assignment') }}" class="btn btn-outline-custom px-4 py-2">
+            <i class="bi bi-camera-video me-2"></i> Today's Assignment
+          </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-4 mt-4 pt-2">
+          <div>
+            <h4 class="fw-bold mb-0 text-primary">100%</h4>
+            <small class="text-muted">Free &amp; Open</small>
+          </div>
+          <div class="vr"></div>
+          <div>
+            <h4 class="fw-bold mb-0 text-purple" style="color: #7c3aed;">12+</h4>
+            <small class="text-muted">Supported Signs</small>
+          </div>
+          <div class="vr"></div>
+          <div>
+            <h4 class="fw-bold mb-0 text-success">Live</h4>
+            <small class="text-muted">Webcam AI Check</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 text-center">
+        <div class="p-4 bg-white rounded-4 shadow-lg border border-light-subtle position-relative">
+          <div class="ratio ratio-4x3 rounded-3 overflow-hidden bg-light mb-3 border">
+            <img src="{{ url_for('static', filename='images/signs/hello.svg') }}" alt="ISL Hello Sign" class="img-fluid p-3">
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="text-start">
+              <span class="badge bg-primary-subtle text-primary mb-1">Featured Sign</span>
+              <h5 class="fw-bold mb-0">HELLO / NAMASTE</h5>
+            </div>
+            <a href="{{ url_for('lesson_detail', sign_code='HELLO') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+              View Guide <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Features Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-semibold small text-uppercase">Platform Highlights</span>
+      <h2 class="fw-bold mt-1">Everything You Need to Get Started</h2>
+      <p class="text-muted mx-auto" style="max-width: 600px;">
+        Designed specifically for third-year college demonstration with simple navigation, verified ISL postures, and practical interactive testing.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <!-- Feature Card 1 -->
+      <div class="col-md-4">
+        <div class="feature-card h-100 p-4">
+          <div class="card-icon-box icon-blue">
+            <i class="bi bi-grid-3x3-gap"></i>
+          </div>
+          <h4 class="fw-bold mb-2">1. Learn ISL</h4>
+          <p class="text-muted mb-4">
+            Explore structured lessons organized into <strong>Basic Words</strong>, <strong>Numbers (0–9)</strong>, and <strong>Alphabets</strong>. Study accurate reference graphics and simple hand movement guidelines.
+          </p>
+          <a href="{{ url_for('learn') }}" class="fw-semibold text-decoration-none text-primary mt-auto">
+            Explore Lessons <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Feature Card 2 -->
+      <div class="col-md-4">
+        <div class="feature-card h-100 p-4 border-primary shadow-sm" style="background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);">
+          <div class="card-icon-box icon-purple">
+            <i class="bi bi-webcam"></i>
+          </div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <h4 class="fw-bold mb-0">2. Daily Assignment</h4>
+            <span class="badge bg-danger rounded-pill px-2">Most Important</span>
+          </div>
+          <p class="text-muted mb-4">
+            Perform 5 rotated daily signs in front of your webcam. SignEase uses <strong>MediaPipe</strong> and <strong>Random Forest ML</strong> to recognize your hand landmarks in real time and evaluate your accuracy.
+          </p>
+          <a href="{{ url_for('assignment') }}" class="fw-semibold text-decoration-none text-purple mt-auto" style="color: #7c3aed;">
+            Start Daily Test <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Feature Card 3 -->
+      <div class="col-md-4">
+        <div class="feature-card h-100 p-4">
+          <div class="card-icon-box icon-green">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h4 class="fw-bold mb-2">3. My Progress</h4>
+          <p class="text-muted mb-4">
+            Track your performance with persistent SQLite records. View total completed daily tests, attempted questions, correct vs. incorrect gestures, and overall accuracy percentage.
+          </p>
+          <a href="{{ url_for('progress') }}" class="fw-semibold text-decoration-none text-success mt-auto">
+            Check Progress <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Supported Signs Section -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="row align-items-center mb-4">
+      <div class="col-md-8">
+        <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill mb-2">
+          <i class="bi bi-check2-circle me-1"></i> ML Model Verified
+        </span>
+        <h3 class="fw-bold mb-1">Supported Static ISL Signs</h3>
+        <p class="text-muted mb-0">
+          SignEase currently focuses on high-precision detection of these verified single-hand ISL static signs:
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('learn') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+          View All Lessons
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      {% for sign in supported_signs %}
+      <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <a href="{{ url_for('lesson_detail', sign_code=sign.sign_code) }}" class="text-decoration-none text-dark">
+          <div class="card text-center p-2 rounded-4 border hover-shadow transition h-100">
+            <div class="p-2" style="height: 90px; display: flex; align-items: center; justify-content: center;">
+              <img src="{{ sign.image_path }}" alt="{{ sign.name }}" style="max-height: 80px; max-width: 100%;">
+            </div>
+            <div class="card-body p-2 pt-0">
+              <span class="badge bg-light text-secondary border small mb-1">{{ sign.category|capitalize }}</span>
+              <h6 class="fw-bold mb-0 text-truncate" title="{{ sign.name }}">{{ sign.name }}</h6>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+  <div class="container text-center">
+    <span class="text-primary fw-semibold small text-uppercase">Workflow</span>
+    <h2 class="fw-bold mt-1 mb-5">How SignEase Works in 3 Steps</h2>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="p-4 bg-white rounded-4 border h-100 shadow-sm">
+          <div class="badge bg-primary text-white fs-5 rounded-circle p-3 mb-3" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center;">1</div>
+          <h5 class="fw-bold">Observe Reference Sign</h5>
+          <p class="text-muted small mb-0">
+            Read beginner-friendly explanations and examine accurate hand anatomy illustrations showing finger positions and palm direction.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4 bg-white rounded-4 border h-100 shadow-sm">
+          <div class="badge bg-purple text-white fs-5 rounded-circle p-3 mb-3" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; background: #7c3aed;">2</div>
+          <h5 class="fw-bold">Perform In Front of Camera</h5>
+          <p class="text-muted small mb-0">
+            Open your browser camera. MediaPipe detects your hand and extracts 21 spatial landmarks with wrist normalization.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-4 bg-white rounded-4 border h-100 shadow-sm">
+          <div class="badge bg-success text-white fs-5 rounded-circle p-3 mb-3" style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center;">3</div>
+          <h5 class="fw-bold">Get Instant AI Feedback</h5>
+          <p class="text-muted small mb-0">
+            The trained Random Forest model predicts your gesture, scores your daily assignment question, and logs your progress.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

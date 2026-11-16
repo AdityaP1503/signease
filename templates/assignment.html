@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Assignment – SignEase{% endblock %}
+
+{% block content %}
+<div class="container py-4 assignment-container">
+  
+  <!-- Assignment Header & Meta -->
+  <div class="row align-items-center mb-4">
+    <div class="col-md-7">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-purple-subtle text-purple px-3 py-1 rounded-pill fw-bold" style="color: #7c3aed; background: #f5f3ff;">
+          <i class="bi bi-calendar-event me-1"></i> Assignment Date: {{ assignment.assignment_date }}
+        </span>
+        {% if assignment.status == 'completed' %}
+        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+          <i class="bi bi-check-all me-1"></i> Completed
+        </span>
+        {% else %}
+        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1">
+          <i class="bi bi-hourglass-split me-1"></i> In Progress
+        </span>
+        {% endif %}
+      </div>
+      <h2 class="fw-bold mb-0">Daily Webcam Assignment</h2>
+    </div>
+
+    <!-- Overall Assignment Score Display -->
+    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+      <div class="d-inline-flex align-items-center bg-white border rounded-4 px-3 py-2 shadow-sm">
+        <div class="text-start me-3">
+          <span class="small text-muted d-block">Assignment Score</span>
+          <span class="fw-bold fs-4 text-primary" id="assignment-score-display">{{ assignment.score }}%</span>
+        </div>
+        <div class="vr me-3" style="height: 35px;"></div>
+        <div class="text-start">
+          <span class="small text-muted d-block">Progress</span>
+          <span class="fw-bold fs-6 text-dark" id="assignment-progress-text">
+            {{ questions|selectattr('is_correct', 'equalto', 1)|list|length }} / {{ questions|length }} Solved
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Navigation Pills -->
+  <div class="bg-white p-3 rounded-4 border shadow-sm mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-semibold text-secondary small me-2">Questions:</span>
+        {% for q in questions %}
+        <a href="{{ url_for('assignment', q=q.question_num) }}" 
+           class="q-pill text-decoration-none {% if q.question_num == current_q.question_num %}active{% elif q.is_correct %}correct{% elif q.attempts_count > 0 %}attempted{% endif %}"
+           data-qnum="{{ q.question_num }}"
+           title="Question {{ q.question_num }}: {{ q.sign_name }}">
+          {% if q.is_correct %}
+          <i class="bi bi-check-lg"></i>
+          {% else %}
+          {{ q.question_num }}
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+
+      <div class="small text-muted">
+        Question <strong>{{ current_q.question_num }}</strong> of <strong>{{ questions|length }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Assignment Interactive Workspace -->
+  <div class="row g-4">
+    
+    <!-- LEFT COLUMN: Question & Reference Image -->
+    <div class="col-lg-5">
+      <div class="custom-card p-4 h-100 d-flex flex-column" id="question-details-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-primary rounded-pill px-3 py-1">
+            Question {{ current_q.question_num }}
+          </span>
+          <span class="text-muted small">Target: <code>{{ current_q.sign_code }}</code></span>
+        </div>
+
+        <h4 class="fw-bold text-dark mt-2 mb-3">
+          {{ current_q.question_text }}
+        </h4>
+
+        <!-- Reference Image Container -->
+        <div class="text-center p-3 bg-light rounded-4 border mb-3 position-relative">
+          <img src="{{ current_q.image_path }}" alt="{{ current_q.sign_name }}" class="img-fluid" style="max-height: 220px;">
+          <span class="position-absolute bottom-0 start-50 translate-middle-x mb-2 badge bg-dark bg-opacity-75 rounded-pill px-3 py-1 small">
+            Official ISL Reference Sign
+          </span>
+        </div>
+
+        <!-- Instructions -->
+        <div class="p-3 bg-primary-subtle rounded-3 border border-primary-subtle mb-3">
+          <div class="small fw-bold text-dark mb-1">
+            <i class="bi bi-info-circle-fill me-1 text-primary"></i> Instructions:
+          </div>
+          <p class="small text-dark mb-0" style="line-height: 1.5;">
+            {{ current_q.hand_instructions }}
+          </p>
+        </div>
+
+        <!-- Navigation Buttons between questions -->
+        <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+          {% if current_q.question_num > 1 %}
+          <a href="{{ url_for('assignment', q=current_q.question_num - 1) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-chevron-left me-1"></i> Previous
+          </a>
+          {% else %}
+          <div></div>
+          {% endif %}
+
+          {% if current_q.question_num < questions|length %}
+          <a id="btn-next-question" href="{{ url_for('assignment', q=current_q.question_num + 1) }}" class="btn btn-outline-primary btn-sm {% if not current_q.is_correct %}d-none{% endif %}">
+            Next Question <i class="bi bi-chevron-right ms-1"></i>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Live Webcam & Real-time AI Recognition -->
+    <div class="col-lg-7">
+      <div class="custom-card p-4 h-100 d-flex flex-column" 
+           id="active-question-card"
+           data-assignment-id="{{ assignment.id }}"
+           data-question-num="{{ current_q.question_num }}"
+           data-expected-sign="{{ current_q.sign_code }}">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">
+            <i class="bi bi-camera-video text-primary me-2"></i>Live Webcam Recognition
+          </h5>
+          <span class="badge bg-light text-secondary border">Single-Hand MediaPipe AI</span>
+        </div>
+
+        <!-- Live Camera Viewport -->
+        <div class="camera-box mb-3">
+          <video id="webcam-video" autoplay playsinline muted class="d-none"></video>
+          <canvas id="webcam-canvas"></canvas>
+
+          <div id="camera-placeholder" class="camera-placeholder">
+            <i class="bi bi-webcam"></i>
+            <h5 class="fw-bold mb-1">Webcam Inactive</h5>
+            <p class="small text-muted mb-3">Click below to start your camera and perform the sign.</p>
+            <button type="button" class="btn btn-primary-gradient btn-sm px-4" onclick="document.getElementById('btn-start-camera').click();">
+              <i class="bi bi-camera-video me-1"></i> Start Camera
+            </button>
+          </div>
+
+          <div id="camera-live-indicator" class="camera-live-indicator d-none">
+            <span class="pulse-dot"></span> LIVE CAMERA
+          </div>
+        </div>
+
+        <!-- Control Action Buttons -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button id="btn-start-camera" type="button" class="btn btn-primary px-3">
+            <i class="bi bi-camera-video me-1"></i> Start Camera
+          </button>
+          <button id="btn-stop-camera" type="button" class="btn btn-outline-secondary px-3 d-none">
+            <i class="bi bi-stop-circle me-1"></i> Stop Camera
+          </button>
+          <button id="btn-check-sign" type="button" class="btn btn-success flex-grow-1" disabled>
+            <i class="bi bi-check-circle me-1"></i> Submit Answer / Check Sign
+          </button>
+          <button id="btn-retry-sign" type="button" class="btn btn-warning text-dark px-3 d-none">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Try Again
+          </button>
+        </div>
+
+        <!-- Feedback & Scoring Card -->
+        <div id="feedback-card" class="feedback-card {% if current_q.is_correct %}feedback-correct{% elif current_q.attempts_count > 0 %}feedback-incorrect{% else %}feedback-neutral{% endif %} mt-auto">
+          {% if current_q.is_correct %}
+          <span id="feedback-status-badge" class="badge bg-success mb-2">
+            <i class="bi bi-check-circle-fill me-1"></i> Solved
+          </span>
+          <div id="feedback-text" class="fw-semibold">
+            Correct! Your sign for "{{ current_q.sign_name }}" has been verified.
+          </div>
+          <div id="feedback-details">
+            <div class="mt-2 d-flex align-items-center gap-3">
+              <span class="small fw-semibold">Recognized: <span class="badge bg-dark">{{ current_q.last_predicted_sign }}</span></span>
+              <span class="small text-muted">Confidence: <strong>{{ current_q.last_confidence }}%</strong></span>
+            </div>
+          </div>
+          {% elif current_q.attempts_count > 0 %}
+          <span id="feedback-status-badge" class="badge bg-danger mb-2">
+            <i class="bi bi-x-circle-fill me-1"></i> Previous Attempt
+          </span>
+          <div id="feedback-text" class="fw-semibold">
+            Last detected: "{{ current_q.last_predicted_sign }}" ({{ current_q.last_confidence }}%). Try adjusting your fingers and perform again!
+          </div>
+          <div id="feedback-details" class="d-none"></div>
+          {% else %}
+          <span id="feedback-status-badge" class="badge bg-secondary mb-2">
+            <i class="bi bi-info-circle me-1"></i> Ready
+          </span>
+          <div id="feedback-text" class="fw-semibold">
+            Start camera, position your hand clearly, and click "Submit Answer".
+          </div>
+          <div id="feedback-details" class="d-none"></div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assignment Completion Modal -->
+<div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg text-center p-3">
+      <div class="modal-body p-4">
+        <div class="badge bg-success-subtle text-success p-3 rounded-circle mb-3 fs-2" style="width: 70px; height: 70px; display: inline-flex; align-items: center; justify-content: center;">
+          <i class="bi bi-trophy-fill"></i>
+        </div>
+        <h3 class="fw-bold mb-2">Assignment Completed!</h3>
+        <p class="text-muted mb-4">Great effort! You've attempted all 5 daily Indian Sign Language questions.</p>
+
+        <div class="p-3 bg-light rounded-4 border mb-4">
+          <div class="row">
+            <div class="col-6 border-end">
+              <span class="small text-muted d-block">Final Score</span>
+              <span class="fw-bold fs-3 text-primary" id="modal-final-score">{{ assignment.score }}%</span>
+            </div>
+            <div class="col-6">
+              <span class="small text-muted d-block">Correct Signs</span>
+              <span class="fw-bold fs-3 text-success" id="modal-correct-count">
+                {{ questions|selectattr('is_correct', 'equalto', 1)|list|length }} of {{ questions|length }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-secondary flex-grow-1" data-bs-dismiss="modal">
+            Review Questions
+          </button>
+          <a href="{{ url_for('progress') }}" class="btn btn-primary-gradient flex-grow-1">
+            <i class="bi bi-bar-chart-fill me-1"></i> View My Progress
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/assignment.js') }}"></script>
+{% endblock %}
